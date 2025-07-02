@@ -54,8 +54,4 @@ export SKIP_USER_CREATION=1
 
 print_status "Running install.sh script"
 
-print_status "Removing docker-compose.yaml dummy file"
-
-rm -f docker-compose.yaml
-
 ./install.sh
