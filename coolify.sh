@@ -54,4 +54,8 @@ export SKIP_USER_CREATION=1
 
 print_status "Running install.sh script"
 
+print_status "Removing docker-compose.yml file (from sentry-self-hosted/docker-compose.yml), so it doesn't override coolify's modified version"
+
+rm -f docker-compose.yml
+
 ./install.sh
