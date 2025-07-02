@@ -58,21 +58,21 @@ print_status "Removing docker-compose.yml file (from sentry-self-hosted/docker-c
 
 rm -f docker-compose.yml
 
-if ! ./install.sh; then
-    print_error "The install.sh script failed. For the first time. This is normal. We will run it again."
-    if ! ./install.sh; then
-        print_error "The install.sh script failed again. This is also normal. We will run it again."
-        if ! ./install.sh; then
-            print_error "The install.sh script failed again. This is ALSO normal. We will run it again."
-            if ! ./install.sh; then
-                print_error "The install.sh script failed again. This is ALSO normal. We will run it again. This is the last time we will run it."
-                if ! ./install.sh; then
-                    print_error "The install.sh script failed again. This is NOT normal. Please check the logs and try again."
-                    exit 1
-                fi
-            fi
+# Run the install.sh script 5 times, to ensure it runs successfully
+for i in {1..5}; do
+    print_status "Running install.sh script (attempt $i/5)"
+    if ./install.sh; then
+        print_status "install.sh script completed successfully on attempt $i"
+        break
+    else
+        print_warning "install.sh script failed on attempt $i"
+        if [ $i -eq 5 ]; then
+            print_error "install.sh script failed on all 5 attempts. Please check the logs and try again."
+            exit 1
         fi
+        print_status "Waiting 5 seconds before next attempt..."
+        sleep 5
     fi
-fi
+done
 
 print_status "Sentry Self-Hosted installed successfully"
