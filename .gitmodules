@@ -1,0 +1,3 @@
+[submodule "sentry"]
+	path = sentry
+	url = https://github.com/getsentry/self-hosted.git
