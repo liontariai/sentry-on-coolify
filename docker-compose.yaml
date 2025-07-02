@@ -1,0 +1,2 @@
+include:
+  - sentry-self-hosted/docker-compose.yml
