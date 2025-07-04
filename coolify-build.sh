@@ -85,7 +85,32 @@ ensure_relay_credentials
 
 source install/generate-secret-key.sh
 source install/update-docker-images.sh
-source install/build-docker-images.sh
+
+
+# source install/build-docker-images.sh
+
+build_docker_images() {
+  echo "${_group}Building and tagging Docker images ..."
+
+  echo ""
+  # Build any service that provides the image sentry-self-hosted-local first,
+  # as it is used as the base image for sentry-cleanup-self-hosted-local.
+  $dcb --force-rm web
+
+  $dcb web
+
+  # Build each other service individually to localize potential failures better.
+  for service in $($dc config --services); do
+  $dcb --force-rm "$service"
+  done
+  echo ""
+  echo "Docker images built."
+  echo "${_endgroup}"
+}
+
+build_docker_images
+
+
 source install/bootstrap-snuba.sh
 source install/upgrade-postgres.sh
 source install/ensure-correct-permissions-profiles-dir.sh
