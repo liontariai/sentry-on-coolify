@@ -103,54 +103,50 @@ source install/ensure-files-from-examples.sh
 echo "source install/check-memcached-backend.sh"
 source install/check-memcached-backend.sh
 
-# source install/ensure-relay-credentials.sh
-ensure_relay_credentials() {
-  echo "${_group}Ensuring Relay credentials ..."
+echo "run relay script inline"
 
-  RELAY_CONFIG_YML=relay/config.yml
-  RELAY_CREDENTIALS_JSON=relay/credentials.json
+echo "${_group}Ensuring Relay credentials ..."
 
-  ensure_file_from_example $RELAY_CONFIG_YML
+RELAY_CONFIG_YML=relay/config.yml
+RELAY_CREDENTIALS_JSON=relay/credentials.json
 
-  if [[ -f "$RELAY_CREDENTIALS_JSON" ]]; then
-    echo "$RELAY_CREDENTIALS_JSON already exists, skipped creation."
-  else
+ensure_file_from_example $RELAY_CONFIG_YML
 
-    # There are a couple gotchas here:
-    #
-    # 1. We need to use a tmp file because if we redirect output directly to
-    #    credentials.json, then the shell will create an empty file that relay
-    #    will then try to read from (regardless of options such as --stdout or
-    #    --overwrite) and fail because it is empty.
-    #
-    # 2. We pull relay:nightly before invoking `run relay credentials generate`
-    #    because an implicit pull under the run causes extra stdout that results
-    #    in a garbage credentials.json.
-    #
-    # 3. We need to use -T to ensure that we receive output on Docker Compose
-    #    1.x and 2.2.3+ (funny story about that ... ;). Note that the long opt
-    #    --no-tty doesn't exist in Docker Compose 1.
+if [[ -f "$RELAY_CREDENTIALS_JSON" ]]; then
+  echo "$RELAY_CREDENTIALS_JSON already exists, skipped creation."
+else
 
-    $dc pull relay
-    creds="$dcr --no-deps -T relay credentials"
-    $creds generate --stdout >"$RELAY_CREDENTIALS_JSON".tmp
-    mv "$RELAY_CREDENTIALS_JSON".tmp "$RELAY_CREDENTIALS_JSON"
-    if [ ! -s "$RELAY_CREDENTIALS_JSON" ]; then
-      # Let's fail early if creds failed, to make debugging easier.
-      echo "Failed to create relay credentials in $RELAY_CREDENTIALS_JSON."
-      echo "--- credentials.json v ---------------------------------------"
-      cat -v "$RELAY_CREDENTIALS_JSON" || true
-      echo "--- credentials.json ^ ---------------------------------------"
-      exit 1
-    fi
-    echo "Relay credentials written to $RELAY_CREDENTIALS_JSON."
+  # There are a couple gotchas here:
+  #
+  # 1. We need to use a tmp file because if we redirect output directly to
+  #    credentials.json, then the shell will create an empty file that relay
+  #    will then try to read from (regardless of options such as --stdout or
+  #    --overwrite) and fail because it is empty.
+  #
+  # 2. We pull relay:nightly before invoking `run relay credentials generate`
+  #    because an implicit pull under the run causes extra stdout that results
+  #    in a garbage credentials.json.
+  #
+  # 3. We need to use -T to ensure that we receive output on Docker Compose
+  #    1.x and 2.2.3+ (funny story about that ... ;). Note that the long opt
+  #    --no-tty doesn't exist in Docker Compose 1.
+
+  $dc pull relay
+  creds="$dcr --no-deps -T relay credentials"
+  $creds generate --stdout >"$RELAY_CREDENTIALS_JSON".tmp
+  mv "$RELAY_CREDENTIALS_JSON".tmp "$RELAY_CREDENTIALS_JSON"
+  if [ ! -s "$RELAY_CREDENTIALS_JSON" ]; then
+    # Let's fail early if creds failed, to make debugging easier.
+    echo "Failed to create relay credentials in $RELAY_CREDENTIALS_JSON."
+    echo "--- credentials.json v ---------------------------------------"
+    cat -v "$RELAY_CREDENTIALS_JSON" || true
+    echo "--- credentials.json ^ ---------------------------------------"
+    exit 1
   fi
+  echo "Relay credentials written to $RELAY_CREDENTIALS_JSON."
+fi
 
-  echo "${_endgroup}"
-}
-
-echo "ensure_relay_credentials"
-ensure_relay_credentials
+echo "${_endgroup}"
 
 echo "source install/generate-secret-key.sh"
 source install/generate-secret-key.sh
@@ -158,31 +154,27 @@ source install/generate-secret-key.sh
 echo "source install/update-docker-images.sh"
 source install/update-docker-images.sh
 
-# source install/build-docker-images.sh
+echo "run build-docker-images script inline"
 
-build_docker_images() {
-  echo "${_group}Building and tagging Docker images ..."
+echo "${_group}Building and tagging Docker images ..."
 
-  echo ""
-  # Build any service that provides the image sentry-self-hosted-local first,
-  # as it is used as the base image for sentry-cleanup-self-hosted-local.
-  # $dcb --force-rm web
+echo ""
+# Build any service that provides the image sentry-self-hosted-local first,
+# as it is used as the base image for sentry-cleanup-self-hosted-local.
+# $dcb --force-rm web
 
-  echo "Building web"
-  $dcb web
+echo "Building web"
+$dcb web
 
-  # Build each other service individually to localize potential failures better.
-  for service in $($dc config --services); do
-    echo "Building $service"
-    $dcb --force-rm "$service"
-  done
-  echo ""
-  echo "Docker images built."
-  echo "${_endgroup}"
-}
+# Build each other service individually to localize potential failures better.
+for service in $($dc config --services); do
+  echo "Building $service"
+  $dcb --force-rm "$service"
+done
+echo ""
+echo "Docker images built."
+echo "${_endgroup}"
 
-echo "build_docker_images"
-build_docker_images
 
 echo "source install/bootstrap-snuba.sh"
 source install/bootstrap-snuba.sh
