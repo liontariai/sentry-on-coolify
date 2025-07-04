@@ -47,11 +47,11 @@ source install/check-latest-commit.sh
 # Upgrading clickhouse needs to come first before turning things off, since we need the old clickhouse image
 # in order to determine whether or not the clickhouse version needs to be upgraded.
 
-echo "source install/upgrade-clickhouse.sh"
-source install/upgrade-clickhouse.sh
+echo "SKIPPING source install/upgrade-clickhouse.sh"
+# source install/upgrade-clickhouse.sh
 
-echo "source install/turn-things-off.sh"
-source install/turn-things-off.sh
+echo "SKIPPING source install/turn-things-off.sh"
+# source install/turn-things-off.sh
 
 echo "source install/create-docker-volumes.sh"
 source install/create-docker-volumes.sh
@@ -127,11 +127,13 @@ build_docker_images() {
   # as it is used as the base image for sentry-cleanup-self-hosted-local.
   # $dcb --force-rm web
 
+  echo "Building web"
   $dcb web
 
   # Build each other service individually to localize potential failures better.
   for service in $($dc config --services); do
-  $dcb --force-rm "$service"
+    echo "Building $service"
+    $dcb --force-rm "$service"
   done
   echo ""
   echo "Docker images built."
