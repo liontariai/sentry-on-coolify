@@ -30,7 +30,6 @@ source install/parse-cli.sh
 echo "source install/detect-platform.sh"
 source install/detect-platform.sh
 
-echo "dc_detect_version"
 dc_detect_version() {
   if [ "${GITHUB_ACTIONS:-}" = "true" ]; then
     _group="::group::"
@@ -75,6 +74,10 @@ dc_detect_version() {
   echo "$dcr"
   echo "${_endgroup}"
 }
+
+echo "dc_detect_version"
+dc_detect_version
+
 # source install/dc-detect-version.sh
 
 echo "source install/error-handling.sh"
