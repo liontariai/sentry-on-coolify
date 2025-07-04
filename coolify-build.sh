@@ -11,6 +11,11 @@ if [[ -n "${MSYSTEM:-}" ]]; then
   exit 1
 fi
 
+
+# Login to Docker Hub to avoid rate limiting
+echo "$DOCKER_TOKEN" | docker login -u "$DOCKER_USERNAME" --password-stdin
+
+
 source install/_logging.sh
 source install/_lib.sh
 
@@ -95,7 +100,7 @@ build_docker_images() {
   echo ""
   # Build any service that provides the image sentry-self-hosted-local first,
   # as it is used as the base image for sentry-cleanup-self-hosted-local.
-  $dcb --force-rm web
+  # $dcb --force-rm web
 
   $dcb web
 
