@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# set -eEuo pipefail
+set -eEuo pipefail
 test "${DEBUG:-}" && set -x
 
 # Override any user-supplied umask that could cause problems, see #1222
