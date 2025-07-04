@@ -65,13 +65,10 @@ else
   dc="$dc_base --ansi never"
 fi
 
-# add --quiet to dc
-dc="$dc --quiet"
-
 proxy_args="--build-arg http_proxy=${http_proxy:-} --build-arg https_proxy=${https_proxy:-} --build-arg no_proxy=${no_proxy:-}"
-dcr="$dc run --pull=never --rm"
-dcb="$dc build $proxy_args"
-dbuild="docker build $proxy_args"
+dcr="$dc run --pull=never --rm > /dev/null"
+dcb="$dc build $proxy_args --quiet"
+dbuild="docker build $proxy_args --quiet"
 echo "$dcr"
 echo "${_endgroup}"
 
