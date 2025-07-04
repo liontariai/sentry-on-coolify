@@ -16,7 +16,7 @@ source install/_lib.sh
 
 
 # Login to Docker Hub to avoid rate limiting
-echo "$DOCKER_TOKEN" | docker login -u "$DOCKER_USERNAME" --password-stdin
+echo "${DOCKER_TOKEN}" | docker login -u "${DOCKER_USERNAME}" --password-stdin
 
 
 # Pre-flight. No impact yet.
