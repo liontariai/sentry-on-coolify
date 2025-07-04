@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -eEuo pipefail
+# set -eEuo pipefail
 test "${DEBUG:-}" && set -x
 
 # Override any user-supplied umask that could cause problems, see #1222
@@ -11,7 +11,10 @@ if [[ -n "${MSYSTEM:-}" ]]; then
   exit 1
 fi
 
+echo "source install/_logging.sh"
 source install/_logging.sh
+
+echo "source install/_lib.sh"
 source install/_lib.sh
 
 
@@ -20,12 +23,22 @@ source install/_lib.sh
 
 
 # Pre-flight. No impact yet.
+
+echo "source install/parse-cli.sh"
 source install/parse-cli.sh
+
+echo "source install/detect-platform.sh"
 source install/detect-platform.sh
+
+echo "source install/dc-detect-version.sh"
 source install/dc-detect-version.sh
+
+echo "source install/error-handling.sh"
 source install/error-handling.sh
 # We set the trap at the top level so that we get better tracebacks.
 trap_with_arg cleanup ERR INT TERM EXIT
+
+echo "source install/check-latest-commit.sh"
 source install/check-latest-commit.sh
 
 # source install/check-minimum-requirements.sh
@@ -33,12 +46,21 @@ source install/check-latest-commit.sh
 # Let's go! Start impacting things.
 # Upgrading clickhouse needs to come first before turning things off, since we need the old clickhouse image
 # in order to determine whether or not the clickhouse version needs to be upgraded.
-source install/upgrade-clickhouse.sh
-source install/turn-things-off.sh
-source install/create-docker-volumes.sh
-source install/ensure-files-from-examples.sh
-source install/check-memcached-backend.sh
 
+echo "source install/upgrade-clickhouse.sh"
+source install/upgrade-clickhouse.sh
+
+echo "source install/turn-things-off.sh"
+source install/turn-things-off.sh
+
+echo "source install/create-docker-volumes.sh"
+source install/create-docker-volumes.sh
+
+echo "source install/ensure-files-from-examples.sh"
+source install/ensure-files-from-examples.sh
+
+echo "source install/check-memcached-backend.sh"
+source install/check-memcached-backend.sh
 
 # source install/ensure-relay-credentials.sh
 ensure_relay_credentials() {
@@ -86,11 +108,14 @@ ensure_relay_credentials() {
   echo "${_endgroup}"
 }
 
+echo "ensure_relay_credentials"
 ensure_relay_credentials
 
+echo "source install/generate-secret-key.sh"
 source install/generate-secret-key.sh
-source install/update-docker-images.sh
 
+echo "source install/update-docker-images.sh"
+source install/update-docker-images.sh
 
 # source install/build-docker-images.sh
 
@@ -113,13 +138,26 @@ build_docker_images() {
   echo "${_endgroup}"
 }
 
+echo "build_docker_images"
 build_docker_images
 
-
+echo "source install/bootstrap-snuba.sh"
 source install/bootstrap-snuba.sh
+
+echo "source install/upgrade-postgres.sh"
 source install/upgrade-postgres.sh
+
+echo "source install/ensure-correct-permissions-profiles-dir.sh"
 source install/ensure-correct-permissions-profiles-dir.sh
+
+echo "source install/set-up-and-migrate-database.sh"
 source install/set-up-and-migrate-database.sh
+
+echo "source install/geoip.sh"
 source install/geoip.sh
+
+echo "source install/setup-js-sdk-assets.sh"
 source install/setup-js-sdk-assets.sh
+
+echo "source install/wrap-up.sh"
 source install/wrap-up.sh
