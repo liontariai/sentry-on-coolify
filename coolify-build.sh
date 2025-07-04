@@ -11,13 +11,13 @@ if [[ -n "${MSYSTEM:-}" ]]; then
   exit 1
 fi
 
+source install/_logging.sh
+source install/_lib.sh
+
 
 # Login to Docker Hub to avoid rate limiting
 echo "$DOCKER_TOKEN" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
-
-source install/_logging.sh
-source install/_lib.sh
 
 # Pre-flight. No impact yet.
 source install/parse-cli.sh
